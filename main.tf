@@ -1,3 +1,9 @@
+# Generate SSH Key
+resource "tls_private_key" "example_ssh" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 # Resource Group
 resource "azurerm_resource_group" "example" {
   name     = "rg-policy-practice"
@@ -56,8 +62,7 @@ resource "azurerm_linux_virtual_machine" "example" {
 
   admin_ssh_key {
     username   = "azureuser"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtestkeyonly sonam@test"
-
+    public_key = tls_private_key.example_ssh.public_key_openssh
   }
 
   os_disk {

@@ -37,3 +37,14 @@ output "vm_private_ip" {
   description = "Private IP address of the VM"
   value       = azurerm_network_interface.example.private_ip_address
 }
+
+output "ssh_private_key" {
+  description = "SSH private key to connect to the VM"
+  value       = tls_private_key.example_ssh.private_key_pem
+  sensitive   = true
+}
+
+output "ssh_command" {
+  description = "Command to SSH into the VM"
+  value       = "ssh -i private_key.pem azureuser@${azurerm_network_interface.example.private_ip_address}"
+}
