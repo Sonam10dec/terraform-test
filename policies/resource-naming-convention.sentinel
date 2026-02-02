@@ -1,0 +1,67 @@
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Naming conventions for Azure resources
+naming_rules = {
+  "azurerm_resource_group": {
+    "prefix": "rg-",
+    "max_length": 90,
+  },
+  "azurerm_virtual_network": {
+    "prefix": "vnet-",
+    "max_length": 64,
+  },
+  "azurerm_subnet": {
+    "prefix": "subnet-",
+    "max_length": 80,
+  },
+  "azurerm_network_interface": {
+    "prefix": "nic-",
+    "max_length": 80,
+  },
+  "azurerm_linux_virtual_machine": {
+    "prefix": "vm-",
+    "max_length": 64,
+  },
+  "azurerm_windows_virtual_machine": {
+    "prefix": "vm-",
+    "max_length": 15,
+  },
+}
+
+# Find all resources that have naming rules
+all_resources = filter tfplan.resource_changes as _, rc {
+  rc.mode is "managed" and
+  rc.type in keys(naming_rules) and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+# Validation function
+validate_name = func(resource) {
+  resource_type = resource.type
+  name = resource.change.after.name
+  rules = naming_rules[resource_type]
+  
+  # Check prefix
+  if not strings.has_prefix(name, rules.prefix) {
+    print("Resource", resource.address, "name does not start with required prefix:", rules.prefix)
+    print("Current name:", name)
+    return false
+  }
+  
+  # Check length
+  if length(name) > rules.max_length {
+    print("Resource", resource.address, "name exceeds maximum length of", rules.max_length)
+    print("Current name:", name, "Length:", length(name))
+    return false
+  }
+  
+  return true
+}
+
+# Main rule
+main = rule {
+  all all_resources as _, resource {
+    validate_name(resource)
+  }
+}
