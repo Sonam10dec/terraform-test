@@ -32,17 +32,17 @@ resource "azurerm_subnet" "example" {
 }
 
 # # Public IP
-# resource "azurerm_public_ip" "example" {
-#   name                = "pip-vm-policy-practice"
-#   location            = azurerm_resource_group.example.location
-#   resource_group_name = azurerm_resource_group.example.name
-#   allocation_method   = "Dynamic"
+resource "azurerm_public_ip" "example" {
+  name                = "pip-vm-policy-practice"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  allocation_method   = "Dynamic"
 
-#   tags = {
-#     environment = "practice"
-#     purpose     = "policy-as-code"
-#   }
-# }
+  tags = {
+    environment = "practice"
+    purpose     = "policy-as-code"
+  }
+}
 
 # Network Interface
 resource "azurerm_network_interface" "example" {
